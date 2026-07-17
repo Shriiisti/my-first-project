@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>us, but make it magic 🧸</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<style>
+  :root{
+    --paper:        #f4ecd8;
+    --paper-card:   #fbf4e4;
+    --ink:          #5b4a36;
+    --ink-soft:     #8a7960;
+    --olive:        #7c8a54;
+    --olive-deep:   #5c6a3c;
+    --blush:        #e7a6a0;
+    --blush-deep:   #c97e79;
+    --butter:       #eccf7c;
+    --pearl-hi:     #fffdf7;
+    --pearl-lo:     #cbb99a;
+    --line:         #c9b591;
+  }
+
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+  html,body{
+    margin:0;
+    min-height:100vh;
+    background:#ded1ae;
+    font-family:'Patrick Hand', cursive;
+    color:var(--ink);
+  }
+
+  body{ display:flex; justify-content:center; }
+
+  /* ---------- ambient watercolor blobs ---------- */
+  .blob{
+    position:fixed;
+    border-radius:50%;
+    filter:blur(38px);
+    opacity:.5;
+    mix-blend-mode:multiply;
+    pointer-events:none;
+    z-index:0;
+  }
+  .blob1{ width:260px; height:260px; background:var(--blush); top:-60px; left:-70px; }
+  .blob2{ width:220px; height:220px; background:var(--butter); top:420px; right:-90px; }
+  .blob3{ width:260px; height:260px; background:var(--olive); bottom:-80px; left:-60px; opacity:.32;}
+
+  /* ---------- app shell ---------- */
+  .app{
+    position:relative;
+    z-index:1;
+    width:100%;
+    max-width:450px;
+    min-height:100vh;
+    background:
+      repeating-linear-gradient(0deg, rgba(201,181,145,0.12) 0px, rgba(201,181,145,0.12) 1px, transparent 1px, transparent 34px),
+      var(--paper);
+    box-shadow:0 0 60px rgba(0,0,0,.25);
+    padding:30px 18px 60px;
+    overflow-x:hidden;
+  }
+
+  header{ text-align:center; margin-bottom:24px; }
+  header .eyebrow{
+    font-size:13px; letter-spacing:2px; text-transform:uppercase; color:var(--olive-deep);
+  }
+  header h1{
+    font-family:'Caveat', cursive; font-weight:700; font-size:44px; line-height:1.05;
+    margin:2px 0 6px; color:var(--ink);
+  }
+  header p{ font-size:16px; color:var(--ink-soft); margin:0; }
+
+  /* ---------- crochet-lace framed card ---------- */
+  .lace-card{
+    position:relative;
+    background:var(--paper-card);
+    border-radius:8px;
+    margin:20px 0 30px;
+    padding:22px 18px 20px;
+    border-left:2px dashed var(--line);
+    border-right:2px dashed var(--line);
+    box-shadow:0 10px 22px rgba(90,70,40,.14), 0 2px 0 rgba(255,255,255,.5) inset;
+  }
+  .lace-card.tilt-l{ transform:rotate(-1.1deg); }
+  .lace-card.tilt-r{ transform:rotate(1deg); }
+
+  .lace-edge{
+    position:absolute;
+    left:0; right:0;
+    height:11px;
+    background-image:
+      radial-gradient(circle at 6px 6px, var(--paper-card) 4.4px, transparent 5px),
+      radial-gradient(circle at 6px 6px, var(--line) 4.6px, transparent 5.4px);
+    background-size:12px 12px;
+    background-repeat:repeat-x;
+  }
+  .lace-edge.top{ top:-6px; }
+  .lace-edge.bottom{ bottom:-6px; transform:rotate(180deg); }
+
+  .pin{
+    position:absolute; top:-13px; left:50%; transform:translateX(-50%);
+    width:20px; height:20px; border-radius:50%;
+    background:radial-gradient(circle at 32% 28%, var(--pearl-hi) 0%, var(--pearl-lo) 60%, #a99872 100%);
+    box-shadow:0 3px 5px rgba(0,0,0,.3), inset 0 0 2px rgba(255,255,255,.8);
+    z-index:4;
+  }
+
+  .label{
+    font-family:'Caveat', cursive; font-weight:700; font-size:26px;
+    color:var(--olive-deep); margin:6px 0 14px; text-align:center;
+  }
+
+  /* ---------- squish everything interactive ---------- */
+  button, .emoji-btn, .photo-slot, input{ transition:transform .12s ease; }
+  button:active, .emoji-btn:active, .photo-slot:active{ transform:scale(.92); }
+
+  /* ---------- shimmer button ---------- */
+  .shimmer-btn{
+    position:relative; overflow:hidden; border:none; cursor:pointer;
+    font-family:'Caveat', cursive; font-weight:700; color:#fff8ea;
+    background:linear-gradient(135deg, var(--olive) 0%, var(--olive-deep) 100%);
+    border-radius:40px;
+    box-shadow:0 8px 18px rgba(92,106,60,.4);
+  }
+  .shimmer-btn::after{
+    content:""; position:absolute; top:0; left:-60%; width:40%; height:100%;
+    background:linear-gradient(120deg, transparent 0%, rgba(255,255,255,.55) 50%, transparent 100%);
+    transform:skewX(-20deg);
+    animation:shimmer 2.6s infinite;
+  }
+  @keyframes shimmer{ 0%{left:-60%;} 45%{left:130%;} 100%{left:130%;} }
+
+  /* ---------- ribbon bow (used on polaroids) ---------- */
+  .ribbon{ position:absolute; top:-10px; right:14px; width:30px; height:22px; z-index:3; pointer-events:none; }
+  .ribbon::before, .ribbon::after{
+    content:""; position:absolute; width:15px; height:15px; background:var(--blush);
+    border:2px solid var(--blush-deep); top:2px;
+  }
+  .ribbon::before{ left:-3px; border-radius:70% 30% 60% 40%; transform:rotate(-28deg); }
+  .ribbon::after{ right:-3px; border-radius:30% 70% 40% 60%; transform:rotate(28deg); }
+  .ribbon-knot{ position:absolute; top:-3px; right:24px; width:8px; height:8px; border-radius:50%; background:var(--blush-deep); z-index:4; }
+
+  /* ---------- hero: thinking of you ---------- */
+  .hero{ text-align:center; }
+  .hero .subtext{ font-size:15px; color:var(--ink-soft); margin:0 0 16px; }
+  #thinkingBtn{ width:100%; padding:22px 10px; font-size:29px; letter-spacing:.4px; }
+  .ping-count{ margin-top:14px; font-size:15px; color:var(--ink-soft); }
+  .ping-count span{ font-family:'Caveat', cursive; font-weight:700; font-size:22px; color:var(--olive-deep); }
+
+  /* ---------- toast ---------- */
+  #toast{
+    position:fixed; left:50%; bottom:26px; transform:translate(-50%, 20px);
+    background:var(--olive-deep); color:#fff8ea; font-family:'Caveat', cursive; font-weight:700;
+    font-size:20px; padding:12px 22px; border-radius:30px; box-shadow:0 10px 24px rgba(0,0,0,.3);
+    opacity:0; pointer-events:none; transition:opacity .35s ease, transform .35s ease; z-index:50;
+    max-width:88vw; text-align:center;
+  }
+  #toast.show{ opacity:1; transform:translate(-50%, 0); }
+
+  /* ---------- mood sync ---------- */
+  .mood-grid{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-bottom:16px;
+  }
+  .emoji-btn{
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    background:var(--paper); border:2.5px solid transparent; border-radius:14px;
+    padding:10px 4px; cursor:pointer;
+  }
+  .emoji-btn .em{ font-size:24px; }
+  .emoji-btn .lb{ font-family:'Patrick Hand', cursive; font-size:13px; color:var(--ink-soft); }
+  .emoji-btn.selected{ border-color:var(--olive); background:#fff8ea; box-shadow:0 4px 10px rgba(124,138,84,.35); }
+  .emoji-btn.selected .lb{ color:var(--olive-deep); }
+
+  .mood-readout{ display:flex; gap:10px; }
+  .mood-box{ flex:1; background:var(--paper); border-radius:10px; padding:10px; text-align:center; border:2px dashed var(--line); }
+  .mood-box .mb-label{ font-size:12px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-soft); display:block; margin-bottom:4px; }
+  .mood-box .mb-value{ font-size:22px; font-family:'Caveat', cursive; font-weight:700; color:var(--ink); }
+
+  /* ---------- our vibe song player ---------- */
+  .player{
+    background:linear-gradient(135deg, #6f7d47, #55622f);
+    border-radius:16px; padding:16px 16px 14px; color:#fff8ea;
+    box-shadow:0 10px 22px rgba(70,80,40,.35);
+  }
+  .player-top{ display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+  .vinyl{
+    width:46px; height:46px; border-radius:50%;
+    background:radial-gradient(circle at center, #2b2418 0 6px, #4a3f2f 7px 8px, #241f16 9px 22px);
+    flex:none;
+    animation:spin 4s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .marquee-wrap{ flex:1; overflow:hidden; white-space:nowrap; }
+  .marquee-track{
+    display:inline-block; padding-left:100%;
+    animation:marquee 10s linear infinite;
+    font-family:'Caveat', cursive; font-weight:700; font-size:19px;
+  }
+  @keyframes marquee{ 0%{ transform:translateX(0); } 100%{ transform:translateX(-100%); } }
+  .player-form{ display:flex; gap:8px; margin-top:4px; }
+  .player-form input{
+    flex:1; min-width:0; font-family:'Patrick Hand', cursive; font-size:14px;
+    padding:9px 12px; border-radius:20px; border:none; outline:none; background:rgba(255,253,247,.92); color:var(--ink);
+  }
+  .player-save{
+    border:none; border-radius:20px; padding:0 16px; font-family:'Caveat', cursive; font-weight:700;
+    font-size:16px; background:var(--butter); color:#4a3f2f; cursor:pointer;
+  }
+  .player-link{
+    display:inline-block; margin-top:8px; font-size:13px; color:#fff8ea; text-decoration:underline;
+    word-break:break-all;
+  }
+
+  /* ---------- polaroids (My Day / Her Day) ---------- */
+  .polaroid-row{ display:flex; flex-direction:column; gap:22px; align-items:center; }
+  .polaroid{
+    position:relative;
+    background:#fffdf8; padding:12px 12px 30px; width:220px; border-radius:2px;
+    box-shadow:0 12px 20px rgba(60,45,25,.28);
+  }
+  .polaroid.rot-l{ transform:rotate(-2deg); }
+  .polaroid.rot-r{ transform:rotate(2deg); }
+  .photo-slot{
+    width:100%; height:190px;
+    background:repeating-linear-gradient(45deg, #efe4c9, #efe4c9 10px, #e8dcbd 10px, #e8dcbd 20px);
+    border:2.5px dashed var(--pearl-lo); border-radius:2px;
+    display:flex; align-items:center; justify-content:center; flex-direction:column;
+    cursor:pointer; color:var(--ink-soft); font-size:15px; overflow:hidden;
+  }
+  .photo-slot img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .photo-slot .plus{ font-size:28px; color:var(--olive); margin-bottom:4px; }
+  .polaroid-caption{
+    text-align:center; font-family:'Caveat', cursive; font-weight:700; font-size:20px;
+    color:var(--ink-soft); margin-top:8px;
+  }
+
+  /* ---------- memory lane ---------- */
+  .note-form{ display:flex; gap:8px; margin-bottom:16px; }
+  .note-form input[type="text"]{
+    flex:1; min-width:0; font-family:'Patrick Hand', cursive; font-size:16px;
+    padding:10px 12px; border-radius:20px; border:2px solid var(--line);
+    background:#fffdf8; color:var(--ink); outline:none;
+  }
+  .note-form input[type="text"]:focus{ border-color:var(--olive); }
+  .pin-note-btn{ padding:0 18px; font-size:18px; white-space:nowrap; }
+
+  .timeline{ display:flex; flex-direction:column; gap:16px; max-height:420px; overflow-y:auto; padding:6px 4px 4px; }
+  .note-card{
+    position:relative; background:#fffef6; border:1px solid #e6d9b8; border-radius:4px;
+    padding:16px 14px 12px; box-shadow:0 6px 14px rgba(90,70,40,.16);
+    font-family:'Caveat', cursive; font-weight:600; font-size:21px; line-height:1.35; color:var(--ink);
+  }
+  .note-card:nth-child(odd){ transform:rotate(-1.6deg); }
+  .note-card:nth-child(even){ transform:rotate(1.4deg); }
+  .note-card .date{ display:block; font-family:'Patrick Hand', cursive; font-size:12px; color:var(--ink-soft); margin-top:8px; }
+  .empty-note{ text-align:center; color:var(--ink-soft); font-size:15px; padding:20px 0; }
+
+  footer{ text-align:center; margin-top:8px; font-size:13px; color:var(--ink-soft); }
+
+  @media (prefers-reduced-motion: reduce){
+    .shimmer-btn::after, .vinyl, .marquee-track{ animation:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="blob blob1"></div>
+<div class="blob blob2"></div>
+<div class="blob blob3"></div>
+
+<div class="app">
+
+  <header>
+    <div class="eyebrow">a little world for just us two</div>
+    <h1>us, but make it magic</h1>
+    <p>a scrapbook that only we get to see 🤍</p>
+  </header>
+
+  <!-- 1. Thinking of You -->
+  <section class="lace-card tilt-l hero">
+    <div class="lace-edge top"></div><div class="lace-edge bottom"></div>
+    <div class="pin"></div>
+    <p class="label">send a ping</p>
+    <p class="subtext">tap it whenever you're thinking of her</p>
+    <button id="thinkingBtn" class="shimmer-btn">💌 thinking of you</button>
+    <p class="ping-count">pings sent so far: <span id="pingCount">0</span></p>
+  </section>
+
+  <!-- 2. Daily Mood Sync -->
+  <section class="lace-card tilt-r">
+    <div class="lace-edge top"></div><div class="lace-edge bottom"></div>
+    <div class="pin"></div>
+    <p class="label">daily mood sync</p>
+    <div class="mood-grid">
+      <button class="emoji-btn" data-mood="✨ Happy"><span class="em">✨</span><span class="lb">Happy</span></button>
+      <button class="emoji-btn" data-mood="😴 Exhausted"><span class="em">😴</span><span class="lb">Exhausted</span></button>
+      <button class="emoji-btn" data-mood="🥳 Silly"><span class="em">🥳</span><span class="lb">Silly</span></button>
+      <button class="emoji-btn" data-mood="🍿 Movie Mode"><span class="em">🍿</span><span class="lb">Movie Mode</span></button>
+      <button class="emoji-btn" data-mood="🧸 Need a Hug"><span class="em">🧸</span><span class="lb">Need a Hug</span></button>
+    </div>
+    <div class="mood-readout">
+      <div class="mood-box">
+        <span class="mb-label">my mood today</span>
+        <span class="mb-value" id="myMoodDisplay">—</span>
+      </div>
+      <div class="mood-box">
+        <span class="mb-label">her mood today</span>
+        <span class="mb-value" id="herMoodDisplay">💭</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Our Vibe: Song of the Day -->
+  <section class="lace-card tilt-l">
+    <div class="lace-edge top"></div><div class="lace-edge bottom"></div>
+    <div class="pin"></div>
+    <p class="label">our vibe</p>
+    <div class="player">
+      <div class="player-top">
+        <div class="vinyl"></div>
+        <div class="marquee-wrap">
+          <span class="marquee-track" id="marqueeTrack">Currently playing: Our Favorite Song</span>
+        </div>
+      </div>
+      <div class="player-form">
+        <input type="text" id="songInput" placeholder="paste a Spotify / YouTube link...">
+        <button class="player-save" id="songSaveBtn">save</button>
+      </div>
+      <a href="#" target="_blank" rel="noopener" class="player-link" id="songLink" style="display:none;"></a>
+    </div>
+  </section>
+
+  <!-- 5. Daily Photo Scrapbook: two frames -->
+  <section class="lace-card tilt-r">
+    <div class="lace-edge top"></div><div class="lace-edge bottom"></div>
+    <div class="pin"></div>
+    <p class="label">the daily scrapbook</p>
+    <div class="polaroid-row">
+      <div class="polaroid rot-l">
+        <div class="ribbon"></div><div class="ribbon-knot"></div>
+        <div class="photo-slot" id="photoSlotMine">
+          <span class="plus">+</span><span>add photo</span>
+        </div>
+        <div class="polaroid-caption">my day</div>
+      </div>
+      <div class="polaroid rot-r">
+        <div class="ribbon"></div><div class="ribbon-knot"></div>
+        <div class="photo-slot" id="photoSlotHers">
+          <span class="plus">+</span><span>add photo</span>
+        </div>
+        <div class="polaroid-caption">her day</div>
+      </div>
+    </div>
+    <input type="file" id="photoInputMine" accept="image/*" style="display:none">
+    <input type="file" id="photoInputHers" accept="image/*" style="display:none">
+  </section>
+
+  <!-- 4. Memory Lane -->
+  <section class="lace-card tilt-l">
+    <div class="lace-edge top"></div><div class="lace-edge bottom"></div>
+    <div class="pin"></div>
+    <p class="label">memory lane</p>
+    <div class="note-form">
+      <input type="text" id="noteInput" placeholder="pin a little note..." maxlength="180">
+      <button id="pinNoteBtn" class="shimmer-btn pin-note-btn">pin</button>
+    </div>
+    <div class="timeline" id="timeline"></div>
+  </section>
+
+  <footer>made with 🫶 just for the two of us</footer>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  /* ---------------- storage helpers ---------------- */
+  const store = {
+    get(key, fallback){
+      try{
+        const raw = localStorage.getItem(key);
+        return raw === null ? fallback : JSON.parse(raw);
+      }catch(e){ return fallback; }
+    },
+    set(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+  };
+
+  /* ---------------- toast ---------------- */
+  let toastTimer = null;
+  function showToast(msg){
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+
+  /* ---------------- confetti helpers ---------------- */
+  function burstConfetti(){
+    const colors = ['#7c8a54','#eccf7c','#e7a6a0','#fbf4e4','#5c6a3c'];
+    confetti({ particleCount: 90, spread: 80, origin:{ y:0.6 }, colors, startVelocity:38 });
+    confetti({ particleCount: 60, spread: 120, origin:{ y:0.4 }, colors, scalar:0.8, startVelocity:28 });
+    if (confetti.shapeFromText) {
+      const heart = confetti.shapeFromText({ text: '💕', scalar: 2 });
+      confetti({ particleCount: 22, spread: 90, origin:{ y:0.55 }, shapes:[heart], scalar:2, gravity:0.7 });
+    }
+  }
+  function smallConfetti(){
+    const colors = ['#7c8a54','#eccf7c','#e7a6a0'];
+    confetti({ particleCount: 40, spread: 60, origin:{ y:0.55 }, colors, startVelocity:26 });
+  }
+
+  /* ---------------- 1. thinking of you ---------------- */
+  const pingCountEl = document.getElementById('pingCount');
+  let pings = store.get('pingsSent', 0);
+  pingCountEl.textContent = pings;
+
+  document.getElementById('thinkingBtn').addEventListener('click', () => {
+    pings += 1;
+    store.set('pingsSent', pings);
+    pingCountEl.textContent = pings;
+    burstConfetti();
+    showToast('✨ Ping sent to your bestie!');
+  });
+
+  /* ---------------- 2. mood sync ---------------- */
+  const myMoodDisplay = document.getElementById('myMoodDisplay');
+  const emojiBtns = document.querySelectorAll('.emoji-btn');
+  let myMood = store.get('myMood', null);
+
+  function paintMoodSelection(){
+    emojiBtns.forEach(btn => btn.classList.toggle('selected', btn.dataset.mood === myMood));
+    myMoodDisplay.textContent = myMood || '—';
+  }
+  paintMoodSelection();
+
+  emojiBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      myMood = btn.dataset.mood;
+      store.set('myMood', myMood);
+      paintMoodSelection();
+    });
+  });
+
+  document.getElementById('herMoodDisplay').textContent = store.get('herMoodPlaceholder', '💭');
+
+  /* ---------------- 3. our vibe song player ---------------- */
+  const marqueeTrack = document.getElementById('marqueeTrack');
+  const songInput = document.getElementById('songInput');
+  const songSaveBtn = document.getElementById('songSaveBtn');
+  const songLink = document.getElementById('songLink');
+
+  function renderSong(link){
+    if (link){
+      marqueeTrack.textContent = 'Currently playing: Our Favorite Song';
+      songLink.href = link;
+      songLink.textContent = link;
+      songLink.style.display = 'inline-block';
+    } else {
+      marqueeTrack.textContent = 'Currently playing: Our Favorite Song';
+      songLink.style.display = 'none';
+    }
+  }
+  const savedSong = store.get('songLink', '');
+  songInput.value = savedSong;
+  renderSong(savedSong);
+
+  songSaveBtn.addEventListener('click', () => {
+    const link = songInput.value.trim();
+    store.set('songLink', link);
+    renderSong(link);
+    smallConfetti();
+    showToast('🎶 your song has been saved!');
+  });
+
+  /* ---------------- 5. two polaroids ---------------- */
+  function wirePolaroid(slotId, inputId, storageKey){
+    const slot = document.getElementById(slotId);
+    const input = document.getElementById(inputId);
+
+    function renderPhoto(dataUrl){
+      slot.innerHTML = '';
+      const img = document.createElement('img');
+      img.src = dataUrl;
+      slot.appendChild(img);
+    }
+
+    const saved = store.get(storageKey, null);
+    if (saved) renderPhoto(saved);
+
+    slot.addEventListener('click', () => input.click());
+    input.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        const dataUrl = evt.target.result;
+        store.set(storageKey, dataUrl);
+        renderPhoto(dataUrl);
+        smallConfetti();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+  wirePolaroid('photoSlotMine', 'photoInputMine', 'photoMine');
+  wirePolaroid('photoSlotHers', 'photoInputHers', 'photoHers');
+
+  /* ---------------- 4. memory lane ---------------- */
+  const timelineEl = document.getElementById('timeline');
+  const noteInput = document.getElementById('noteInput');
+  const pinNoteBtn = document.getElementById('pinNoteBtn');
+
+  let notes = store.get('memoryNotes', []);
+
+  function formatDate(ts){
+    return new Date(ts).toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' });
+  }
+
+  function renderNotes(){
+    timelineEl.innerHTML = '';
+    if (notes.length === 0){
+      timelineEl.innerHTML = '<div class="empty-note">no notes pinned yet — write the first one 🤍</div>';
+      return;
+    }
+    notes.slice().reverse().forEach(note => {
+      const card = document.createElement('div');
+      card.className = 'note-card';
+      const text = document.createElement('span');
+      text.textContent = note.text;
+      const date = document.createElement('span');
+      date.className = 'date';
+      date.textContent = formatDate(note.ts);
+      card.appendChild(text);
+      card.appendChild(date);
+      timelineEl.appendChild(card);
+    });
+  }
+  renderNotes();
+
+  function pinNote(){
+    const text = noteInput.value.trim();
+    if (!text) return;
+    notes.push({ text, ts: Date.now() });
+    store.set('memoryNotes', notes);
+    noteInput.value = '';
+    renderNotes();
+    burstConfetti();
+    showToast('📌 note pinned to memory lane!');
+  }
+
+  pinNoteBtn.addEventListener('click', pinNote);
+  noteInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') pinNote(); });
+</script>
+</body>
+</html>
