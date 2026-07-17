@@ -377,17 +377,50 @@
 
 <div id="toast"></div>
 
-<script>
-  /* ---------------- storage helpers ---------------- */
-  const store = {
-    get(key, fallback){
-      try{
-        const raw = localStorage.getItem(key);
-        return raw === null ? fallback : JSON.parse(raw);
-      }catch(e){ return fallback; }
-    },
-    set(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getDatabase, ref, onValue, set, push, runTransaction
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+  /* ---------------- firebase setup ----------------
+     NOTE: your config didn't include a databaseURL (required for
+     Realtime Database, separate from your web app config). This is
+     the standard default URL Firebase assigns a project called
+     "bestie-scrapbook" — open the Realtime Database tab in your
+     Firebase console and confirm the URL at the top matches this
+     exactly. If your database lives in a specific region (e.g.
+     europe-west1), the URL will look different and you'll need to
+     swap it in below. -------------------------------------------- */
+  const firebaseConfig = {
+    apiKey: "AIzaSyC1XesJGMpxRWerzZa9TU06smbJccI1HI8",
+    authDomain: "bestie-scrapbook.firebaseapp.com",
+    databaseURL: "https://bestie-scrapbook-default-rtdb.firebaseio.com",
+    projectId: "bestie-scrapbook",
+    storageBucket: "bestie-scrapbook.firebasestorage.app",
+    messagingSenderId: "315953623806",
+    appId: "1:315953623806:web:e358e19fac888959e0ebaf"
   };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  /* ---------------- device role ----------------
+     Moods need to know "which of us is this device" so that clicking
+     an emoji under MY mood shows up under HER mood on the other
+     person's screen. There's no login system here, so each device
+     is asked once which person it belongs to. This one flag is the
+     only thing kept outside Firebase — everything else below is
+     fully synced through the database. -------------------------- */
+  let role = localStorage.getItem('scrapbookRole');
+  if (role !== 'me' && role !== 'bestie') {
+    const answer = (window.prompt(
+      "Quick one-time setup 🤍\nIs this device YOU, or your BESTIE's?\nType \"me\" or \"bestie\":", "me"
+    ) || 'me').trim().toLowerCase();
+    role = answer.startsWith('b') ? 'bestie' : 'me';
+    localStorage.setItem('scrapbookRole', role);
+  }
+  const otherRole = role === 'me' ? 'bestie' : 'me';
 
   /* ---------------- toast ---------------- */
   let toastTimer = null;
@@ -414,83 +447,86 @@
     confetti({ particleCount: 40, spread: 60, origin:{ y:0.55 }, colors, startVelocity:26 });
   }
 
-  /* ---------------- 1. thinking of you ---------------- */
+  /* ---------------- 1. thinking of you (synced) ---------------- */
   const pingCountEl = document.getElementById('pingCount');
-  let pings = store.get('pingsSent', 0);
-  pingCountEl.textContent = pings;
+  const pingsRef = ref(db, 'scrapbook/pings');
+
+  onValue(pingsRef, (snap) => {
+    pingCountEl.textContent = snap.val() || 0;
+  });
 
   document.getElementById('thinkingBtn').addEventListener('click', () => {
-    pings += 1;
-    store.set('pingsSent', pings);
-    pingCountEl.textContent = pings;
+    runTransaction(pingsRef, (current) => (current || 0) + 1);
     burstConfetti();
     showToast('✨ Ping sent to your bestie!');
   });
 
-  /* ---------------- 2. mood sync ---------------- */
+  /* ---------------- 2. mood sync (synced, role-aware) ---------------- */
   const myMoodDisplay = document.getElementById('myMoodDisplay');
+  const herMoodDisplay = document.getElementById('herMoodDisplay');
   const emojiBtns = document.querySelectorAll('.emoji-btn');
-  let myMood = store.get('myMood', null);
+  const moodsRef = ref(db, 'scrapbook/moods');
 
-  function paintMoodSelection(){
+  onValue(moodsRef, (snap) => {
+    const moods = snap.val() || {};
+    const myMood = moods[role] || null;
+    const herMood = moods[otherRole] || null;
     emojiBtns.forEach(btn => btn.classList.toggle('selected', btn.dataset.mood === myMood));
     myMoodDisplay.textContent = myMood || '—';
-  }
-  paintMoodSelection();
+    herMoodDisplay.textContent = herMood || '💭';
+  });
 
   emojiBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-      myMood = btn.dataset.mood;
-      store.set('myMood', myMood);
-      paintMoodSelection();
+      set(ref(db, `scrapbook/moods/${role}`), btn.dataset.mood);
     });
   });
 
-  document.getElementById('herMoodDisplay').textContent = store.get('herMoodPlaceholder', '💭');
-
-  /* ---------------- 3. our vibe song player ---------------- */
+  /* ---------------- 3. our vibe song player (synced) ---------------- */
   const marqueeTrack = document.getElementById('marqueeTrack');
   const songInput = document.getElementById('songInput');
   const songSaveBtn = document.getElementById('songSaveBtn');
   const songLink = document.getElementById('songLink');
+  const songRef = ref(db, 'scrapbook/song');
 
-  function renderSong(link){
+  onValue(songRef, (snap) => {
+    const link = snap.val() || '';
+    if (document.activeElement !== songInput) songInput.value = link;
+    marqueeTrack.textContent = 'Currently playing: Our Favorite Song';
     if (link){
-      marqueeTrack.textContent = 'Currently playing: Our Favorite Song';
       songLink.href = link;
       songLink.textContent = link;
       songLink.style.display = 'inline-block';
     } else {
-      marqueeTrack.textContent = 'Currently playing: Our Favorite Song';
       songLink.style.display = 'none';
     }
-  }
-  const savedSong = store.get('songLink', '');
-  songInput.value = savedSong;
-  renderSong(savedSong);
+  });
 
   songSaveBtn.addEventListener('click', () => {
     const link = songInput.value.trim();
-    store.set('songLink', link);
-    renderSong(link);
+    set(songRef, link);
     smallConfetti();
     showToast('🎶 your song has been saved!');
   });
 
-  /* ---------------- 5. two polaroids ---------------- */
-  function wirePolaroid(slotId, inputId, storageKey){
+  /* ---------------- 5. two polaroids (synced) ---------------- */
+  function wirePolaroid(slotId, inputId, dbKey){
     const slot = document.getElementById(slotId);
     const input = document.getElementById(inputId);
+    const photoRef = ref(db, `scrapbook/photos/${dbKey}`);
 
     function renderPhoto(dataUrl){
-      slot.innerHTML = '';
-      const img = document.createElement('img');
-      img.src = dataUrl;
-      slot.appendChild(img);
+      if (dataUrl){
+        slot.innerHTML = '';
+        const img = document.createElement('img');
+        img.src = dataUrl;
+        slot.appendChild(img);
+      } else {
+        slot.innerHTML = '<span class="plus">+</span><span>add photo</span>';
+      }
     }
 
-    const saved = store.get(storageKey, null);
-    if (saved) renderPhoto(saved);
+    onValue(photoRef, (snap) => renderPhoto(snap.val()));
 
     slot.addEventListener('click', () => input.click());
     input.addEventListener('change', (e) => {
@@ -498,35 +534,34 @@
       if (!file) return;
       const reader = new FileReader();
       reader.onload = (evt) => {
-        const dataUrl = evt.target.result;
-        store.set(storageKey, dataUrl);
-        renderPhoto(dataUrl);
+        set(photoRef, evt.target.result);
         smallConfetti();
       };
       reader.readAsDataURL(file);
     });
   }
-  wirePolaroid('photoSlotMine', 'photoInputMine', 'photoMine');
-  wirePolaroid('photoSlotHers', 'photoInputHers', 'photoHers');
+  wirePolaroid('photoSlotMine', 'photoInputMine', 'mine');
+  wirePolaroid('photoSlotHers', 'photoInputHers', 'hers');
 
-  /* ---------------- 4. memory lane ---------------- */
+  /* ---------------- 4. memory lane (synced) ---------------- */
   const timelineEl = document.getElementById('timeline');
   const noteInput = document.getElementById('noteInput');
   const pinNoteBtn = document.getElementById('pinNoteBtn');
-
-  let notes = store.get('memoryNotes', []);
+  const notesRef = ref(db, 'scrapbook/notes');
 
   function formatDate(ts){
     return new Date(ts).toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' });
   }
 
-  function renderNotes(){
+  onValue(notesRef, (snap) => {
+    const data = snap.val() || {};
+    const notes = Object.values(data).sort((a, b) => b.ts - a.ts);
     timelineEl.innerHTML = '';
     if (notes.length === 0){
       timelineEl.innerHTML = '<div class="empty-note">no notes pinned yet — write the first one 🤍</div>';
       return;
     }
-    notes.slice().reverse().forEach(note => {
+    notes.forEach(note => {
       const card = document.createElement('div');
       card.className = 'note-card';
       const text = document.createElement('span');
@@ -538,16 +573,13 @@
       card.appendChild(date);
       timelineEl.appendChild(card);
     });
-  }
-  renderNotes();
+  });
 
   function pinNote(){
     const text = noteInput.value.trim();
     if (!text) return;
-    notes.push({ text, ts: Date.now() });
-    store.set('memoryNotes', notes);
+    push(notesRef, { text, ts: Date.now() });
     noteInput.value = '';
-    renderNotes();
     burstConfetti();
     showToast('📌 note pinned to memory lane!');
   }
