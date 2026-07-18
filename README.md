@@ -1,6 +1,6 @@
 # 🌸 Our Secret Space
 
-A real-time, magical scrapbook Progressive Web App (PWA) built for me and my bestie. 
+A real-time, magical scrapbook Progressive Web App (PWA) built for me and my bestie.
 
 ✨ **Features:**
 * Real-time "Thinking of You" pings
@@ -8,4 +8,4 @@ A real-time, magical scrapbook Progressive Web App (PWA) built for me and my bes
 * Live memory lane notes with timestamps
 * Dual music players
 
-🔗 **Live Link:** [Click here to open the app!](https://shriiisti.github.io/my-first-project/)
+🔒 *Note: The live deployment link is kept private.*
