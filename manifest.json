@@ -1,0 +1,15 @@
+{
+  "name": "Our Secret Space",
+  "short_name": "Besties",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F4F1EA",
+  "theme_color": "#7B8A61",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/833/833472.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
