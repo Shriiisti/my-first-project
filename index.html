@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>us, but make it magic 🧸</title>
-<link rel="manifest" href="manifest.json">
+<title>Shristi & Theerthashree 🧸</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
@@ -48,8 +47,9 @@
     z-index:0;
   }
   .blob1{ width:260px; height:260px; background:var(--blush); top:-60px; left:-70px; }
-  .blob2{ width:220px; height:220px; background:var(--butter); top:420px; right:-90px; }
+  .blob2{ width:220px; height:220px; background:var(--butter); top:520px; right:-90px; }
   .blob3{ width:260px; height:260px; background:var(--olive); bottom:-80px; left:-60px; opacity:.32;}
+  .blob4{ width:200px; height:200px; background:var(--blush); bottom:900px; right:-70px; opacity:.28; }
 
   /* ---------- app shell ---------- */
   .app{
@@ -71,7 +71,7 @@
     font-size:13px; letter-spacing:2px; text-transform:uppercase; color:var(--olive-deep);
   }
   header h1{
-    font-family:'Caveat', cursive; font-weight:700; font-size:44px; line-height:1.05;
+    font-family:'Caveat', cursive; font-weight:700; font-size:40px; line-height:1.1;
     margin:2px 0 6px; color:var(--ink);
   }
   header p{ font-size:16px; color:var(--ink-soft); margin:0; }
@@ -117,7 +117,7 @@
   }
 
   /* ---------- squish everything interactive ---------- */
-  button, .emoji-btn, .photo-slot, input{ transition:transform .12s ease; }
+  button, .emoji-btn, .photo-slot, input, select{ transition:transform .12s ease; }
   button:active, .emoji-btn:active, .photo-slot:active{ transform:scale(.92); }
 
   /* ---------- shimmer button ---------- */
@@ -164,25 +164,39 @@
   #toast.show{ opacity:1; transform:translate(-50%, 0); }
 
   /* ---------- mood sync ---------- */
+  .mood-person{ margin-bottom:14px; }
+  .mood-person-name{
+    font-family:'Caveat', cursive; font-weight:700; font-size:21px;
+    color:var(--ink); text-align:center; margin:0 0 10px;
+  }
   .mood-grid{
-    display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-bottom:16px;
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-bottom:10px;
   }
   .emoji-btn{
-    display:flex; flex-direction:column; align-items:center; gap:4px;
+    display:flex; flex-direction:column; align-items:center; gap:3px;
     background:var(--paper); border:2.5px solid transparent; border-radius:14px;
-    padding:10px 4px; cursor:pointer;
+    padding:9px 4px; cursor:pointer;
   }
-  .emoji-btn .em{ font-size:24px; }
-  .emoji-btn .lb{ font-family:'Patrick Hand', cursive; font-size:13px; color:var(--ink-soft); }
+  .emoji-btn .em{ font-size:22px; }
+  .emoji-btn .lb{ font-family:'Patrick Hand', cursive; font-size:12px; color:var(--ink-soft); }
   .emoji-btn.selected{ border-color:var(--olive); background:#fff8ea; box-shadow:0 4px 10px rgba(124,138,84,.35); }
   .emoji-btn.selected .lb{ color:var(--olive-deep); }
 
-  .mood-readout{ display:flex; gap:10px; }
-  .mood-box{ flex:1; background:var(--paper); border-radius:10px; padding:10px; text-align:center; border:2px dashed var(--line); }
-  .mood-box .mb-label{ font-size:12px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-soft); display:block; margin-bottom:4px; }
-  .mood-box .mb-value{ font-size:22px; font-family:'Caveat', cursive; font-weight:700; color:var(--ink); }
+  .mood-glimpse{
+    text-align:center; font-size:14px; color:var(--ink-soft);
+    background:var(--paper); border:2px dashed var(--line); border-radius:10px; padding:8px;
+  }
+  .mood-glimpse span{ font-family:'Caveat', cursive; font-weight:700; font-size:17px; color:var(--olive-deep); }
 
-  /* ---------- our vibe song player ---------- */
+  .mood-divider{
+    border:none; border-top:2px dashed var(--line); margin:18px 4px;
+  }
+
+  /* ---------- our vibes song players ---------- */
+  .player-title{
+    font-family:'Caveat', cursive; font-weight:700; font-size:20px;
+    color:var(--ink); text-align:center; margin:0 0 10px;
+  }
   .player{
     background:linear-gradient(135deg, #6f7d47, #55622f);
     border-radius:16px; padding:16px 16px 14px; color:#fff8ea;
@@ -200,7 +214,7 @@
   .marquee-track{
     display:inline-block; padding-left:100%;
     animation:marquee 10s linear infinite;
-    font-family:'Caveat', cursive; font-weight:700; font-size:19px;
+    font-family:'Caveat', cursive; font-weight:700; font-size:18px;
   }
   @keyframes marquee{ 0%{ transform:translateX(0); } 100%{ transform:translateX(-100%); } }
   .player-form{ display:flex; gap:8px; margin-top:4px; }
@@ -217,7 +231,7 @@
     word-break:break-all;
   }
 
-  /* ---------- polaroids (My Day / Her Day) ---------- */
+  /* ---------- polaroids ---------- */
   .polaroid-row{ display:flex; flex-direction:column; gap:22px; align-items:center; }
   .polaroid{
     position:relative;
@@ -241,6 +255,13 @@
   }
 
   /* ---------- memory lane ---------- */
+  .author-row{ margin-bottom:10px; }
+  .author-select{
+    width:100%; font-family:'Patrick Hand', cursive; font-size:15px;
+    padding:9px 14px; border-radius:20px; border:2px dashed var(--line);
+    background:#fffdf8; color:var(--ink); outline:none; cursor:pointer;
+  }
+  .author-select:focus{ border-color:var(--olive); }
   .note-form{ display:flex; gap:8px; margin-bottom:16px; }
   .note-form input[type="text"]{
     flex:1; min-width:0; font-family:'Patrick Hand', cursive; font-size:16px;
@@ -258,7 +279,10 @@
   }
   .note-card:nth-child(odd){ transform:rotate(-1.6deg); }
   .note-card:nth-child(even){ transform:rotate(1.4deg); }
-  .note-card .date{ display:block; font-family:'Patrick Hand', cursive; font-size:12px; color:var(--ink-soft); margin-top:8px; }
+  .note-card .meta{
+    display:block; font-family:'Patrick Hand', cursive; font-size:12px; color:var(--ink-soft); margin-top:8px;
+  }
+  .note-card .meta b{ color:var(--olive-deep); font-family:'Caveat', cursive; font-size:14px; }
   .empty-note{ text-align:center; color:var(--ink-soft); font-size:15px; padding:20px 0; }
 
   footer{ text-align:center; margin-top:8px; font-size:13px; color:var(--ink-soft); }
@@ -273,12 +297,13 @@
 <div class="blob blob1"></div>
 <div class="blob blob2"></div>
 <div class="blob blob3"></div>
+<div class="blob blob4"></div>
 
 <div class="app">
 
   <header>
     <div class="eyebrow">a little world for just us two</div>
-    <h1>us, but make it magic</h1>
+    <h1>Shristi &amp; Theerthashree</h1>
     <p>a scrapbook that only we get to see 🤍</p>
   </header>
 
@@ -287,52 +312,80 @@
     <div class="lace-edge top"></div><div class="lace-edge bottom"></div>
     <div class="pin"></div>
     <p class="label">send a ping</p>
-    <p class="subtext">tap it whenever you're thinking of her</p>
+    <p class="subtext">tap it whenever you're thinking of the other</p>
     <button id="thinkingBtn" class="shimmer-btn">💌 thinking of you</button>
     <p class="ping-count">pings sent so far: <span id="pingCount">0</span></p>
   </section>
 
-  <!-- 2. Daily Mood Sync -->
+  <!-- 2. Independent Mood Sync -->
   <section class="lace-card tilt-r">
     <div class="lace-edge top"></div><div class="lace-edge bottom"></div>
     <div class="pin"></div>
     <p class="label">daily mood sync</p>
-    <div class="mood-grid">
-      <button class="emoji-btn" data-mood="✨ Happy"><span class="em">✨</span><span class="lb">Happy</span></button>
-      <button class="emoji-btn" data-mood="😴 Exhausted"><span class="em">😴</span><span class="lb">Exhausted</span></button>
-      <button class="emoji-btn" data-mood="🥳 Silly"><span class="em">🥳</span><span class="lb">Silly</span></button>
-      <button class="emoji-btn" data-mood="🍿 Movie Mode"><span class="em">🍿</span><span class="lb">Movie Mode</span></button>
-      <button class="emoji-btn" data-mood="🧸 Need a Hug"><span class="em">🧸</span><span class="lb">Need a Hug</span></button>
+
+    <div class="mood-person">
+      <p class="mood-person-name">Shristi's Mood</p>
+      <div class="mood-grid" id="moodGrid-shristi">
+        <button class="emoji-btn" data-mood="✨ Happy"><span class="em">✨</span><span class="lb">Happy</span></button>
+        <button class="emoji-btn" data-mood="😴 Exhausted"><span class="em">😴</span><span class="lb">Exhausted</span></button>
+        <button class="emoji-btn" data-mood="🥳 Silly"><span class="em">🥳</span><span class="lb">Silly</span></button>
+        <button class="emoji-btn" data-mood="🍿 Movie Mode"><span class="em">🍿</span><span class="lb">Movie Mode</span></button>
+        <button class="emoji-btn" data-mood="🧸 Need a Hug"><span class="em">🧸</span><span class="lb">Need a Hug</span></button>
+      </div>
+      <div class="mood-glimpse">Theerthashree is feeling: <span id="glimpse-theerthashree">💭</span></div>
     </div>
-    <div class="mood-readout">
-      <div class="mood-box">
-        <span class="mb-label">my mood today</span>
-        <span class="mb-value" id="myMoodDisplay">—</span>
+
+    <hr class="mood-divider">
+
+    <div class="mood-person">
+      <p class="mood-person-name">Theerthashree's Mood</p>
+      <div class="mood-grid" id="moodGrid-theerthashree">
+        <button class="emoji-btn" data-mood="✨ Happy"><span class="em">✨</span><span class="lb">Happy</span></button>
+        <button class="emoji-btn" data-mood="😴 Exhausted"><span class="em">😴</span><span class="lb">Exhausted</span></button>
+        <button class="emoji-btn" data-mood="🥳 Silly"><span class="em">🥳</span><span class="lb">Silly</span></button>
+        <button class="emoji-btn" data-mood="🍿 Movie Mode"><span class="em">🍿</span><span class="lb">Movie Mode</span></button>
+        <button class="emoji-btn" data-mood="🧸 Need a Hug"><span class="em">🧸</span><span class="lb">Need a Hug</span></button>
       </div>
-      <div class="mood-box">
-        <span class="mb-label">her mood today</span>
-        <span class="mb-value" id="herMoodDisplay">💭</span>
-      </div>
+      <div class="mood-glimpse">Shristi is feeling: <span id="glimpse-shristi">💭</span></div>
     </div>
   </section>
 
-  <!-- 3. Our Vibe: Song of the Day -->
+  <!-- 4. Two Song Widgets -->
   <section class="lace-card tilt-l">
     <div class="lace-edge top"></div><div class="lace-edge bottom"></div>
     <div class="pin"></div>
-    <p class="label">our vibe</p>
+    <p class="label">our vibes</p>
+
+    <p class="player-title">Shristi's Vibe</p>
     <div class="player">
       <div class="player-top">
         <div class="vinyl"></div>
         <div class="marquee-wrap">
-          <span class="marquee-track" id="marqueeTrack">Currently playing: Our Favorite Song</span>
+          <span class="marquee-track" id="marqueeTrack-shristi">Currently playing: Shristi's Favorite Song</span>
         </div>
       </div>
       <div class="player-form">
-        <input type="text" id="songInput" placeholder="paste a Spotify / YouTube link...">
-        <button class="player-save" id="songSaveBtn">save</button>
+        <input type="text" id="songInput-shristi" placeholder="paste a Spotify / YouTube link...">
+        <button class="player-save" id="songSaveBtn-shristi">save</button>
       </div>
-      <a href="#" target="_blank" rel="noopener" class="player-link" id="songLink" style="display:none;"></a>
+      <a href="#" target="_blank" rel="noopener" class="player-link" id="songLink-shristi" style="display:none;"></a>
+    </div>
+
+    <hr class="mood-divider">
+
+    <p class="player-title">Theerthashree's Vibe</p>
+    <div class="player">
+      <div class="player-top">
+        <div class="vinyl"></div>
+        <div class="marquee-wrap">
+          <span class="marquee-track" id="marqueeTrack-theerthashree">Currently playing: Theerthashree's Favorite Song</span>
+        </div>
+      </div>
+      <div class="player-form">
+        <input type="text" id="songInput-theerthashree" placeholder="paste a Spotify / YouTube link...">
+        <button class="player-save" id="songSaveBtn-theerthashree">save</button>
+      </div>
+      <a href="#" target="_blank" rel="noopener" class="player-link" id="songLink-theerthashree" style="display:none;"></a>
     </div>
   </section>
 
@@ -344,28 +397,34 @@
     <div class="polaroid-row">
       <div class="polaroid rot-l">
         <div class="ribbon"></div><div class="ribbon-knot"></div>
-        <div class="photo-slot" id="photoSlotMine">
+        <div class="photo-slot" id="photoSlot-shristi">
           <span class="plus">+</span><span>add photo</span>
         </div>
-        <div class="polaroid-caption">my day</div>
+        <div class="polaroid-caption">Shristi's Day</div>
       </div>
       <div class="polaroid rot-r">
         <div class="ribbon"></div><div class="ribbon-knot"></div>
-        <div class="photo-slot" id="photoSlotHers">
+        <div class="photo-slot" id="photoSlot-theerthashree">
           <span class="plus">+</span><span>add photo</span>
         </div>
-        <div class="polaroid-caption">her day</div>
+        <div class="polaroid-caption">Theerthashree's Day</div>
       </div>
     </div>
-    <input type="file" id="photoInputMine" accept="image/*" style="display:none">
-    <input type="file" id="photoInputHers" accept="image/*" style="display:none">
+    <input type="file" id="photoInput-shristi" accept="image/*" style="display:none">
+    <input type="file" id="photoInput-theerthashree" accept="image/*" style="display:none">
   </section>
 
-  <!-- 4. Memory Lane -->
+  <!-- 3. Memory Lane Notes (with authors) -->
   <section class="lace-card tilt-l">
     <div class="lace-edge top"></div><div class="lace-edge bottom"></div>
     <div class="pin"></div>
     <p class="label">memory lane</p>
+    <div class="author-row">
+      <select id="authorSelect" class="author-select">
+        <option value="Shristi">I am Shristi</option>
+        <option value="Theerthashree">I am Theerthashree</option>
+      </select>
+    </div>
     <div class="note-form">
       <input type="text" id="noteInput" placeholder="pin a little note..." maxlength="180">
       <button id="pinNoteBtn" class="shimmer-btn pin-note-btn">pin</button>
@@ -385,14 +444,14 @@
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
   /* ---------------- firebase setup ----------------
-     NOTE: your config didn't include a databaseURL (required for
-     Realtime Database, separate from your web app config). This is
-     the standard default URL Firebase assigns a project called
+     NOTE: your config doesn't include a databaseURL (required for
+     Realtime Database, separate from the web app config). This is
+     the conventional default URL Firebase assigns a project called
      "bestie-scrapbook" — open the Realtime Database tab in your
      Firebase console and confirm the URL at the top matches this
      exactly. If your database lives in a specific region (e.g.
-     europe-west1), the URL will look different and you'll need to
-     swap it in below. -------------------------------------------- */
+     asia-southeast1 or europe-west1), the URL will look different
+     and you'll need to swap it in below before this connects. --- */
   const firebaseConfig = {
     apiKey: "AIzaSyC1XesJGMpxRWerzZa9TU06smbJccI1HI8",
     authDomain: "bestie-scrapbook.firebaseapp.com",
@@ -406,22 +465,8 @@
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
-  /* ---------------- device role ----------------
-     Moods need to know "which of us is this device" so that clicking
-     an emoji under MY mood shows up under HER mood on the other
-     person's screen. There's no login system here, so each device
-     is asked once which person it belongs to. This one flag is the
-     only thing kept outside Firebase — everything else below is
-     fully synced through the database. -------------------------- */
-  let role = localStorage.getItem('scrapbookRole');
-  if (role !== 'me' && role !== 'bestie') {
-    const answer = (window.prompt(
-      "Quick one-time setup 🤍\nIs this device YOU, or your BESTIE's?\nType \"me\" or \"bestie\":", "me"
-    ) || 'me').trim().toLowerCase();
-    role = answer.startsWith('b') ? 'bestie' : 'me';
-    localStorage.setItem('scrapbookRole', role);
-  }
-  const otherRole = role === 'me' ? 'bestie' : 'me';
+  const PEOPLE = ['shristi', 'theerthashree'];
+  const NAME = { shristi: 'Shristi', theerthashree: 'Theerthashree' };
 
   /* ---------------- toast ---------------- */
   let toastTimer = null;
@@ -448,73 +493,94 @@
     confetti({ particleCount: 40, spread: 60, origin:{ y:0.55 }, colors, startVelocity:26 });
   }
 
-  /* ---------------- 1. thinking of you (synced) ---------------- */
+  /* ---------------- 1. thinking of you (bug fix: single source of truth) ----
+     The counter write and the "someone is thinking of you" alert are both
+     driven by ONE onValue listener on /pings. This fixes the earlier version
+     where the clicking device could fire its own confetti/toast AND then
+     fire again from the listener, double-triggering the effect. Now: click
+     only increments the number in the database; every open device (sender
+     included) reacts identically the moment the number changes. The very
+     first snapshot on page load is skipped so opening the app doesn't set
+     off confetti immediately. -------------------------------------------- */
   const pingCountEl = document.getElementById('pingCount');
   const pingsRef = ref(db, 'scrapbook/pings');
+  let isFirstPingSnapshot = true;
 
   onValue(pingsRef, (snap) => {
-    pingCountEl.textContent = snap.val() || 0;
+    const value = snap.val() || 0;
+    pingCountEl.textContent = value;
+    if (isFirstPingSnapshot){
+      isFirstPingSnapshot = false;
+      return;
+    }
+    burstConfetti();
+    showToast('✨ Someone is thinking of you!');
   });
 
   document.getElementById('thinkingBtn').addEventListener('click', () => {
     runTransaction(pingsRef, (current) => (current || 0) + 1);
-    burstConfetti();
-    showToast('✨ Ping sent to your bestie!');
   });
 
-  /* ---------------- 2. mood sync (synced, role-aware) ---------------- */
-  const myMoodDisplay = document.getElementById('myMoodDisplay');
-  const herMoodDisplay = document.getElementById('herMoodDisplay');
-  const emojiBtns = document.querySelectorAll('.emoji-btn');
-  const moodsRef = ref(db, 'scrapbook/moods');
+  /* ---------------- 2. independent mood sync (bug fix: real per-person nodes) ----
+     Each person gets their own grid AND their own database node at
+     /moods/shristi and /moods/theerthashree. Selecting an emoji in one
+     grid never touches the other person's node — that was the sync bug
+     in the previous version, where mood was tied to a single guessed
+     "device role" instead of an explicit, named selection. ---------- */
+  function wireMoodGrid(owner){
+    const grid = document.getElementById(`moodGrid-${owner}`);
+    const buttons = grid.querySelectorAll('.emoji-btn');
+    const moodRef = ref(db, `scrapbook/moods/${owner}`);
+    const glimpseEl = document.getElementById(`glimpse-${owner}`);
 
-  onValue(moodsRef, (snap) => {
-    const moods = snap.val() || {};
-    const myMood = moods[role] || null;
-    const herMood = moods[otherRole] || null;
-    emojiBtns.forEach(btn => btn.classList.toggle('selected', btn.dataset.mood === myMood));
-    myMoodDisplay.textContent = myMood || '—';
-    herMoodDisplay.textContent = herMood || '💭';
-  });
-
-  emojiBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      set(ref(db, `scrapbook/moods/${role}`), btn.dataset.mood);
+    onValue(moodRef, (snap) => {
+      const mood = snap.val() || null;
+      buttons.forEach(btn => btn.classList.toggle('selected', btn.dataset.mood === mood));
+      if (glimpseEl) glimpseEl.textContent = mood || '💭';
     });
-  });
 
-  /* ---------------- 3. our vibe song player (synced) ---------------- */
-  const marqueeTrack = document.getElementById('marqueeTrack');
-  const songInput = document.getElementById('songInput');
-  const songSaveBtn = document.getElementById('songSaveBtn');
-  const songLink = document.getElementById('songLink');
-  const songRef = ref(db, 'scrapbook/song');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => set(moodRef, btn.dataset.mood));
+    });
+  }
+  PEOPLE.forEach(wireMoodGrid);
 
-  onValue(songRef, (snap) => {
-    const link = snap.val() || '';
-    if (document.activeElement !== songInput) songInput.value = link;
-    marqueeTrack.textContent = 'Currently playing: Our Favorite Song';
-    if (link){
-      songLink.href = link;
-      songLink.textContent = link;
-      songLink.style.display = 'inline-block';
-    } else {
-      songLink.style.display = 'none';
-    }
-  });
+  /* ---------------- 4. two independent song widgets ---------------- */
+  function wireSongPlayer(owner){
+    const marquee = document.getElementById(`marqueeTrack-${owner}`);
+    const input = document.getElementById(`songInput-${owner}`);
+    const saveBtn = document.getElementById(`songSaveBtn-${owner}`);
+    const linkEl = document.getElementById(`songLink-${owner}`);
+    const songRef = ref(db, `scrapbook/songs/${owner}`);
+    const defaultText = `Currently playing: ${NAME[owner]}'s Favorite Song`;
 
-  songSaveBtn.addEventListener('click', () => {
-    const link = songInput.value.trim();
-    set(songRef, link);
-    smallConfetti();
-    showToast('🎶 your song has been saved!');
-  });
+    onValue(songRef, (snap) => {
+      const link = snap.val() || '';
+      if (document.activeElement !== input) input.value = link;
+      marquee.textContent = defaultText;
+      if (link){
+        linkEl.href = link;
+        linkEl.textContent = link;
+        linkEl.style.display = 'inline-block';
+      } else {
+        linkEl.style.display = 'none';
+      }
+    });
 
-  /* ---------------- 5. two polaroids (synced) ---------------- */
-  function wirePolaroid(slotId, inputId, dbKey){
-    const slot = document.getElementById(slotId);
-    const input = document.getElementById(inputId);
-    const photoRef = ref(db, `scrapbook/photos/${dbKey}`);
+    saveBtn.addEventListener('click', () => {
+      const link = input.value.trim();
+      set(songRef, link);
+      smallConfetti();
+      showToast(`🎶 ${NAME[owner]}'s vibe has been saved!`);
+    });
+  }
+  PEOPLE.forEach(wireSongPlayer);
+
+  /* ---------------- 5. two independent polaroids ---------------- */
+  function wirePolaroid(owner){
+    const slot = document.getElementById(`photoSlot-${owner}`);
+    const input = document.getElementById(`photoInput-${owner}`);
+    const photoRef = ref(db, `scrapbook/photos/${owner}`);
 
     function renderPhoto(dataUrl){
       if (dataUrl){
@@ -541,17 +607,19 @@
       reader.readAsDataURL(file);
     });
   }
-  wirePolaroid('photoSlotMine', 'photoInputMine', 'mine');
-  wirePolaroid('photoSlotHers', 'photoInputHers', 'hers');
+  PEOPLE.forEach(wirePolaroid);
 
-  /* ---------------- 4. memory lane (synced) ---------------- */
+  /* ---------------- 3. memory lane notes, with author + timestamp ---------------- */
   const timelineEl = document.getElementById('timeline');
   const noteInput = document.getElementById('noteInput');
   const pinNoteBtn = document.getElementById('pinNoteBtn');
+  const authorSelect = document.getElementById('authorSelect');
   const notesRef = ref(db, 'scrapbook/notes');
 
-  function formatDate(ts){
-    return new Date(ts).toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' });
+  function formatDateTime(ts){
+    return new Date(ts).toLocaleString(undefined, {
+      month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit'
+    });
   }
 
   onValue(notesRef, (snap) => {
@@ -567,11 +635,15 @@
       card.className = 'note-card';
       const text = document.createElement('span');
       text.textContent = note.text;
-      const date = document.createElement('span');
-      date.className = 'date';
-      date.textContent = formatDate(note.ts);
+      const meta = document.createElement('span');
+      meta.className = 'meta';
+      const authorB = document.createElement('b');
+      authorB.textContent = note.author || 'Someone';
+      meta.appendChild(document.createTextNode('— '));
+      meta.appendChild(authorB);
+      meta.appendChild(document.createTextNode(' · ' + formatDateTime(note.ts)));
       card.appendChild(text);
-      card.appendChild(date);
+      card.appendChild(meta);
       timelineEl.appendChild(card);
     });
   });
@@ -579,7 +651,7 @@
   function pinNote(){
     const text = noteInput.value.trim();
     if (!text) return;
-    push(notesRef, { text, ts: Date.now() });
+    push(notesRef, { text, author: authorSelect.value, ts: Date.now() });
     noteInput.value = '';
     burstConfetti();
     showToast('📌 note pinned to memory lane!');
